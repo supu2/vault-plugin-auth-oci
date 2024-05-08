@@ -52,8 +52,8 @@ OLDIFS=$IFS
 IFS=: MAIN_GOPATH=($GOPATH)
 IFS=$OLDIFS
 
-rm -f ${MAIN_GOPATH}/bin/${TOOL}
-cp bin/${TOOL} ${MAIN_GOPATH}/bin/
+#rm -f ${MAIN_GOPATH}/bin/${TOOL}
+#cp bin/${TOOL} ${MAIN_GOPATH}/bin/
 
 # Done!
 echo
