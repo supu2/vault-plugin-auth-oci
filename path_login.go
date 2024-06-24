@@ -3,6 +3,7 @@ package ociauth
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -238,7 +239,7 @@ func (b *backend) pathLoginUpdate(ctx context.Context, req *logical.Request, dat
 		},
 		Alias: &logical.Alias{
 			Name:     *instance.DisplayName,
-			Metadata: instance.FreeformTags,
+			Metadata: mergeTags(&instance, "freeform_", "defined_"),
 		},
 	}
 
@@ -301,6 +302,25 @@ func requestTargetToMethodURL(requestTarget []string, roleName string) (method s
 	}
 
 	return parts[0], parts[1], nil
+}
+
+func mergeTags(i *core.GetInstanceResponse, freeformPrefix, definedPrefix string) map[string]string {
+	mergedTags := make(map[string]string)
+
+	for k, v := range i.FreeformTags {
+		mergedTags[freeformPrefix+k] = v
+	}
+
+	for k, v := range i.DefinedTags {
+		bytes, err := json.Marshal(v)
+		if err != nil {
+			fmt.Printf("Error marshaling value for key %s: %v\n", k, err)
+			continue
+		}
+		mergedTags[definedPrefix+k] = string(bytes)
+	}
+
+	return mergedTags
 }
 
 const pathLoginRoleSyn = `
